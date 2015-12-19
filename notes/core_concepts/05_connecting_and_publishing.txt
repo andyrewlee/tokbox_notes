@@ -1,0 +1,77 @@
+Initialize, Connect, and Publish to a Session
+  Once Session ID is obtained
+    and authentication Token as been generated
+      client can interact with that Session through OpenTok client library
+
+Initialize the Session Object
+  need to initialize a local Session Object
+    gets ready to connect to a session
+    Example
+      var apiKey = "";
+      var sessionId = "";
+
+      var token = "";
+      var session = OT.initSession(apiKey, sessionID);
+
+Initialize a Publisher object
+  To initialize publisher call OT.initPublisher() method
+    initializes and returns Publisher objct
+    takes three optional parameters
+      targetElement
+        specifies DOM element or ID attribute of existing DOM element
+          used for the publisher video in the HTML
+      properties
+        list of paramters specifying various properties about Publisher
+          i.e. audioSource, frameRate, resolution, etc.
+      completionHandler
+        function to be called when method succeeds or fails
+          in initializing Publisher object
+
+Connect to a Session
+  Now that we have Session and Publisher object
+    we can connect to Session by calling Session.connect() methods
+      takes Token as input paramter
+  Once session is connected, sessionConnected event will get triggered
+  Example
+    session.on("sessionConnected", function(sessionConnectEvent) {
+      console.log("Session has been connected");
+    });
+    session.connect(token);
+
+Publishing to a Session
+  since we know client has successfully connected to Session
+    when the sessionConnected event occurs
+      this event handler will be where we publish to the Session
+        to publish, use the Session.publish() method
+          need to pass in Publisher object as a parameter
+  Example
+    session.on("sessionConnected", function (event) {
+      session.publish(publisher);
+    });
+  There is difference between publisher object and publishing stream to Session
+    There is difference between initializing Session and connecting as well
+    When you initialize a publisher
+      a local display of published stream is created on web
+        however other users in the Session cannot see the stream yet
+          because call to session.publish() has not been made
+  Users in Subscriber role can only subscribe to streams in a session
+
+Example Flow
+  User A is first user to join Session
+    initializes local Session object using OT.initSession
+      then using the session object calls session.connect()
+        sessionConnected() event fires in User A's browser
+  Another user, User B wants to join Session
+    initializes local Session object using OT.initSession
+      executes session.connect()
+        sessionConnected() event fires in User B's browser
+          at this point User A also gets a connectionCreated() event
+          within sessionConnected handler
+            User B executes session.publish()
+              once stream reaches User A
+                the Session Object fires a streamCreated event
+                  the input parameter for this event is of type StreamEvent
+                    gives information about newly created stream
+                    User can then choose to subscribe to published stream
+                User B also receives a streamCreated event
+                  but receives it on Publisher object instead of Session object

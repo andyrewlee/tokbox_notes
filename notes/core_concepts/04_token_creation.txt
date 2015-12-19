@@ -1,0 +1,30 @@
+Connection Token Creation
+  Session is the room
+    Token is the key to get into the room
+      More than a key
+        can be associated with user roles and have an expiration date
+  can be generated through the dashboard
+    but usually its done through the OpenTok server SDK
+
+Creating token using OpenTok server SDKs
+  Send generateToken to OpenTokSDK object
+    pass session id as an argument
+      returns a string
+    has two arguments
+      First is the Session ID
+      Second is associative array with following optional properties as keys
+        role (String)
+          defines role the user will have
+            Subscriber
+            Publisher
+              default role
+            Moderator
+        data (String)
+          metadata describing the connection
+          can pass userID, name, or other data describing connection
+          can obtain this data server-side or client-side
+        expireTime (int)
+          time when token will expire
+          tokens will expire in 24 hours after being created if not specified
+          if specified
+            must be within 30 days of the creation time

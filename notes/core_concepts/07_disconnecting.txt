@@ -1,0 +1,13 @@
+Disconnect from Session
+  When user leaves web page through which they were connected to a session
+    OpenTok notifies the rest of the Session participants
+      that a connection was destroyed
+        done via the Session's connectionDestroyed event
+          informs other users which user has left by passing ConnectEvent
+            contains details about connection that was disconnected
+  If User A wants to leave Session without leaving web page
+    can call the Session.disconnect() method
+      results in User A receiving sessionDisconnected event
+        and User B receiving the connectionDestroyed event
+          User B will receive the connectionDestroyed event
+            whether User A leaves implicitly or explicitly

@@ -1,0 +1,25 @@
+Unpublishing Your Stream
+  Example
+    function unpublish() {
+      session.unpublish(publisher);
+    }
+      stops the specified publisher from streaming
+        removes local video display from web page
+      Session will aslo send streamDestroyed event to all connections
+        it will be invoked with a StreamEvent object
+      client calling session.unpublish() also recieves streamDestroyed event
+        but on its Publisher object
+
+Unsubscribing from a stream
+  if a client is subscribing to a stream that gets destroyed
+    will want to unsubscribe from that stream
+      session.getSubscribersForStream()
+        makes it easy to figure out which subscribers
+          to pass session.sunsubscribe()
+    in the streamDestroyed event listener
+      pass in stream contained in StreamEvent object
+        to session.getSubscribersForStream()
+          the returned Subscriber objects can be passed into
+            session.unsubscribe()
+              removes video display
+                associated with specified subscriber's stream

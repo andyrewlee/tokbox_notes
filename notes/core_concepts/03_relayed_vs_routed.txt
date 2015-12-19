@@ -1,0 +1,20 @@
+Relayed vs. Routed
+  We can create two different types of sessions
+    Relayed (peer-to-peer)
+      clients will attempt to send audio-video streams directly
+      no need for an intermediate video server
+        latency may be decreased
+    Routed (using OpenTok Media Router)
+      can decrease bandwidth usage in multiparty sessions
+      publishing client only needs to upload one stream to server
+        OpenTok Media Router then replicates stream
+          down to each subscribing client
+        on the other hand, in a relayed session
+          publishing clients must send a separate stream
+            to each suscribing client
+      audio fallback and video recovery
+        i.e. if connection is bad then drop the video only
+          once it improves bring back the video
+      supports archiving feature
+        lets you record, save, and retrieve OpenTok session videos
+
