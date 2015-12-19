@@ -1,0 +1,65 @@
+Streams, Connections, and Sessions
+  Stream
+    single audio-video signal
+      includes user's published webcam and microphone feed
+  Connection
+    logical abstraction of a single browser tab's interaction with a Session
+    mechanism which a browser publishes and subscribes to streams within Session
+  Session
+    Represents entire video chat environment
+      collection of connections publishing and subscribing to streams
+    Dispatches events representing changes in the Session
+    Think of it as a virtual video chat room
+  Each user's browser usually opens single connection to given session
+    through that connection browser may publish stream to the session
+      using that same connection, the browser may subscribe to on or some or all
+        published audio-video streams available in Session
+  Code at each endpoint decides which Session to connect to
+    which streams within that Session to display
+      and whether or not to publish to that Session
+    developers can control what each endpoint sees
+
+Authentication Tokens
+  When browser connects to a session
+    it must authenticate itself by providing server-generated token
+  if Sessions can be seen as virtual video chat rooms to join
+    then tokens can be seen as keys to be used for the security of each room
+  Tokens can have expiration dates
+    can be assigned roles (i.e. publisher, subscriber, and moderator)
+  Tokens can have metadata that's associated with Connection that user makes
+    a user's first name can be associated with their token
+      can be used to display the user's name on video
+
+Publishers and Subscribers
+  End user's experience results from
+    ongoing creation and destruction of publishers and subscribers
+  Publishers
+    publishes audio-video streams to chat session
+      broadcast to all connection in the session using an event
+        a subscriber can subscribe to newly published stream
+    when publisher is instatiated
+      browser notifies Session that it is streaming a new audio-video stream
+    when publisher is destroyed
+      stream is terminated and Session is notified
+  Subscribers
+    consumes audio-video stream in a Session
+      displayed on web page based on calls to OpenTok client-side library
+    when web page is notified a new stream is being published to Session
+      must decide whether or not to subscribe to stream
+      instantiate subscriber for that stream to accept it
+    there is no requirement that all published streams be subscribed to
+      if we want to build a multi-party videoconference
+        subscribe to all published streams
+      if we want to build a speed dating app
+        choose to subscribe to one stream at a time
+
+Client/Server Separation of Duties
+  vast majority of functionality is delivered through client-side library
+    i.e. browser, iOS, Android
+  web server needs to get involved
+    when creating new Sessions or new Tokens for security purposes
+    if endpoint is connecting to a pre-existing session
+      using pre-existing security token
+        server just passes relevant session ID and token which client can use
+    if new token or new video chat environment is desired
+      use web server to connect to appropriate session using appropriate token

@@ -1,0 +1,26 @@
+Session Creation
+  Session is a virtual video chatroom
+    connecting to a particular Session is like entering a specific room
+    must identify which room to enter
+      before we can actually enter it
+        must specify the Session to connect to using Session ID
+          before we can actually enter it
+  Does not expire
+    but authentication Tokens do
+  Cannot explicitly be destroyed
+
+Creating a Session ID
+  Using the dashboard
+    can obtain Session ID using Dashboard page for testing
+  Using OpenTok Server SDKs
+    recommended
+    has OpenTokSDK object that can be used to obtain session IDs
+      can instantiate by passing in API key and Secret
+        from there can create OpenTokSDK createSession() method
+          returns OpenTok Session Object
+            can ask Session Object what the Session ID is
+              then we can serve this Session ID to clients
+    createSession method has optional parameters
+      can specify Location
+      can specify Media Mode
+        Relayed vs Routed

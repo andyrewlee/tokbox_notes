@@ -1,0 +1,107 @@
+https://www.youtube.com/watch?v=8GDe2xGwsBI
+
+Top three use cases
+  Healthcare
+  Experts market
+  Education
+  Gaming
+  Job Interviews
+
+Multi-Party Topologies
+  One to One + One
+    3 person call
+    Customer service + add an expert/supervisor
+    Example Use case
+      RBS: Royal Bank of Scotland
+        Relationship with high net worth individuals
+  Few to Few
+    Group call with 4-6 people
+    Business collaboration tool
+    Example Use case
+      Roll20
+        Small group of people collectively playing a game
+  Many to Many
+    Large group call with up to 20 people
+    Virtual classroom
+    Example Use case
+      Minerva
+        Revolutionze education
+        Learning platform for anyone to have education
+        Creating a large classroom
+          Students can dynamically raise their hands
+
+Mesh Network Topology
+  Every endpoint sends and receives media streams
+    to and from every other endpoint
+      bi-directional to each client
+  Poor man's version of multi-party
+  Pros
+    Simple to implement
+      every client talks to every other client
+    No server infrastructure required
+    Take advantage of P2P connections
+  Cons
+    Not scalabe for large # of participants
+    Harder to scale to large # of subscribers
+    Heavey burden on CPU for encoders
+
+Multipoint Conferencing Unit (MCU)
+  Central server receives and composes media streams
+    delivers a single output stream to each endpoint
+  Every endpoint sends + receives media streams from same server
+  Pros
+    Cheaper bandwidth
+    Traditional enterprise conferencing model
+    Better adaptation
+      can deliver different stream qualities
+    Interoperability with legacy systems
+    Sophisticated media processing
+  Cons
+    More expensive
+      need to operate and scale server infrastructure
+    Introduces latency
+    Traditional enterprice conferencing model
+
+Selective Forwarding Unit (SFU)
+  Central server receives and forwards
+    media streams optimized for each endpoint
+  Instead of delivering a single output stream
+    delivers output stream optimized for each endpoint
+  Pros
+    SPU burden on encoder same as MCU
+    Publisher bandwith cost same as MCU
+    Lightweight on the server
+    Adapatation based on client/server logic
+      temporal scalability
+    Well suited for large scale broadcast
+  Cons
+    May have to decode multiple streams
+    Subscriber cost same as Mesh
+    Adaptation may have bandwidth cost
+  Mesh + MCU for best of both worlds but costs more $$
+
+Takeaway
+  Hybrid SFU with MCU-like capabilities is the way to go
+    Why?
+      Mobile endpoints
+      Legacy hardware
+      Media processing + recording
+      Broadcasting
+
+Broadcasting Topology
+  One to Many (Broadcasting)
+    Social apps like Meerkat, Periscope
+    Live TV Show
+  Few to Many
+    Talk show format (host, talent and audience)
+
+OpenTok Platform
+  Communications platform
+    for embedding video, voice, messaging
+      for websites and mobile apps
+  Pros
+    WebRTC complexities abstracted away
+    Global infrastructure ready for scale
+    Support for dynamic topologies including multi-party
+    Intelligent network adaptation features
+      archiving, connectivity tools
