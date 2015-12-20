@@ -1,0 +1,33 @@
+Session Creation Overview
+  to connect to OpenTok session
+    must specify the id of session we want to connect to
+      each session ID identifies a unique OpenTok session
+        session is a room where users can meet to chat
+  OpenTok sessions do not expire
+    authentication tokens do however
+    up to the developer to either create a room that lasts longer
+      or create a new room for a particular activity
+
+OpenTok Media Router and media modes
+  When creating session
+    we can specify how the clients will send audio-video streams
+      aka media mode, there are two options
+        Default is relayed
+        Relayed
+          Clients will attempt to send audio-video streams directly
+            peer to peer
+              if this fails, session uses TURN server to relay streams
+        Routed
+          Uses OpenTok Media Router to route audio-video streams between clients
+          Pros
+            decreases bandwidth usage in multiparty sessions
+            audio fallback and video recovery
+            archiving
+            group chat with other clients
+
+Best practices when creating sessions
+  If there are two participants
+   use relayed
+  If there are more participants
+    and if we want to use the archiving feature
+      then use routed sesions
