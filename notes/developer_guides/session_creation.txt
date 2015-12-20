@@ -31,3 +31,31 @@ Best practices when creating sessions
   If there are more participants
     and if we want to use the archiving feature
       then use routed sesions
+
+Session Creation - Ruby
+
+Creating a session that uses OpenTok Media Router
+  api_key = "YOUR_API_KEY"
+  api_secret = "YOUR_API_SECRET"
+
+  opentok = OpenTok::OpenTok.new api_key, api_secret
+  session = opentok.create_session media_mode: routed
+  session_id = session.session_id
+
+Creating a relayed session
+  api_key = "YOUR_API_KEY"
+  api_secret = "YOUR_API_SECRET"
+
+  opentok = OpenTok::OpenTok.new api_key, api_secret
+  session = opentok.create_session
+  session_id = session.session_id
+
+Creating an automatically archived session
+  api_key = "YOUR_API_KEY"
+  api_secret = "YOUR_API_SECRET"
+
+  opentok = OpenTok::OpenTok.new api_key, api_secret
+  session = opentok.create_session archive_mode: :always, media_mode: :routed
+
+Using sessions in client applications
+  Use session ID to connect to session from the client

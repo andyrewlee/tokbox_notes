@@ -1,0 +1,53 @@
+Token Creation Overview
+  To authenticate user connecting to OpenTok session
+    user's page must pass a token along with API key
+      we can generate token for each user connecting to session
+
+Roles
+  Each token is assigned a role
+    Subscriber
+      can connect to OpenTok sessions and subscribe to other clients' streams
+        cannot publish their own streams to session
+    Publisher
+      can connect to OpenTok sessions, publish audio-video to session
+        and subscribe to other clients' streams
+    Moderator
+      can force other clients to disconnect from session
+        or force client to stop publishing an audio-video stream
+
+Expiration dates
+  tokens expire after a set period of time (up to 30 days)
+    can specify expiration period
+
+Connection data
+  can add metadata describing client to a token
+
+Best practices when generating tokens
+  Generate new token for every user at the time they try to connect
+  Don't store them or try to reuse them
+  Use connection data to identify users
+    Connection data is a secure way to store information about users
+
+Connection Token Creation - Ruby
+  class SampleController < ApplicationController
+    def action
+      api_key = "YOUR_API_KEY"
+      api_secret = "YOUR_API_SECRET"
+
+      opentok = OpenTok::OpenTok.new api_key, api_secret
+      session = opentok.create_session
+      token = opentok.generate_token
+      # for publisher
+      # token = opentok.generate_token role: :publisher, data: "username=bob"
+    end
+  end
+
+ generate_token
+  takes the following optional parameters
+    role
+      defines the role user will have
+    data
+      metadata
+    expire_time
+      when the token will expire
+        if specified must be within 30 days of creation time
