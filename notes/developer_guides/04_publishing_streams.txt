@@ -1,0 +1,274 @@
+Checking publish capabilities
+  Example
+    if(session.capabilities.publish == 1) {
+      // The client can publish. See the next sesion.
+    } else {
+      // The client cannot publish
+      // You may want to notify the user
+    }
+Initializing a publisher view
+  OT.initPublisher() method initializes and returns a Publisher object
+  The Publisher object represents the view of video you publish
+  Example
+    var publisher;
+    var targetElement = 'publisherContainer';
+
+    publisher = OT.initPublisher(targetElement, null, function(error) {
+      if(error) {
+        // The client cannot publish.
+        // You may want to notify the user.
+      } else {
+        console.log('Publisher initialized.');
+      }
+    });
+      Takes in three parameters
+        targetElement
+          Defines DOM element that the Publisher video replaces
+        properties
+          Set of properties that customize the Publisher
+          Also includes options to specify an audio and video input device
+          Customizing appearance of view in HTML page
+          Select whether to publish audio and video
+          insertMode
+            one of the properties that specifies
+              how Publisher object will be inserted in the HTML DOM
+                in relation to targetElement paramter
+                  "replace"
+                    replaces contents of targetElement (default)
+                  "after"
+                    new element inserted after the targetElement
+                  "before"
+                    new element inserted before the targetElement
+                  "append"
+                    added as a child of the targetElement
+        completionHandler
+          specifies whether the publisher instantiated successfully
+            or with error
+Detecting when a client has granted access to the camera and microphone
+  User must grant access before it can access camera and microphone
+  Example
+    publisher.on({
+      accessAllowed: function(event) {
+        // The user has granted access to the camera and mic.
+      },
+      accessDenied: function(event) {
+        // The user has denied access to the camera and mic.
+      }
+    });
+  Example: there are events when user is presented with the option
+    publisher.on({
+      accessDialogOpened: function(event) {
+        // The Allow/Deny dialog box is opened
+      },
+      acccessDialogClosed: function(event) {
+        // The Allow/Deny dialog box is closed
+      }
+    });
+Publishing a stream
+  Once we create a Publisher object
+    we can pass it in the publish() method of Session object
+      to publish a stream to the session
+      Example
+        publisher = OT.initPublisher('replacementElementId');
+        session.publish(publisher, function(error) {
+          if(error) {
+            console.log(error);
+          } else {
+            console.log('Publishing a stream.');
+          }
+        });
+        // dispatches streamCreated when it starts streaming to session
+        publisher.on('streamCreated', function(event) {
+          console.log('The publisher started streaming.');
+        });
+Stopping a publisher from streaming to a session
+  Example
+    session.unpublish(publisher);
+Detecting when a publisher stops streaming a session
+  Publisher object dispatches streamDestroyed event
+    when it stops streaming to the session
+  Example
+    var publisher = OT.initPublisher();
+    session.publish(publisher);
+    publisher.on('streamDestroyed', function(event) {
+      console.log("The publisher stopped streaming. Reason: " + event.reason);
+    });
+  By default whne streamDestroyed event is sent for your Publisher
+    the Publisher is destroyed and removed from the HTML DOM
+Setting the video resolution of the stream
+  Example
+    var publisherProperties = {resolution: '1280x720'};
+    var publisher = OT.initPublisher(targetElement, publisherProperties);
+
+    publisher.on('streamCreated', function(event) {
+      console.log('Stream resolution: ' + event.stream.videoDimensions.width +
+                  'x' + event.stream.videoDimensions.height);
+    });
+Setting the frame rate of the stream
+  Example
+    var publisherProperties = {frameRate: 7};
+    var publisher = OT.initPublisher(targetElement, publisherProperties);
+
+    publisher.on('streamCreated', function(event) {
+      console.log('Frame rate: ' + event.stream.frameRate);
+    });
+Deleting a publisher
+  Calling the destroy() method deletes the Publisher object
+    and removes it from the HTML DOM
+      Example
+        publisher.destroy();
+Testing a publisher's stream
+  must use session that uses the OpenTok Media Router
+    must set testNetwork property to ture in the options object when subscribing
+      can then use the getStats() method of the Subscribe object
+
+Best practices
+  Allowing Device Access
+    Let users know that they are going to be asked
+      to allow access to their camera and microphone
+        Example
+          publisher.on({
+            accessDialogOpened: function(event) {
+              // Show allow camera message
+              pleaseAllowCamera.style.display = 'block';
+            },
+            accessDialogClosed: function(event) {
+              // Hide allow camera message
+              pleaseAllowCamera.style.display = 'none';
+            }
+          });
+  Split OT.initPublisher() and Session.publish()
+    Example
+      // instantiate publisher on outside instead of inside of handler
+      var publisher = OT.initPublisher();
+      session.connect(token, function(error) {
+        // some error handling code
+        if(!err) {
+          session.publish(publisher);
+        }
+      });
+  Resolution and frame rate
+    We can set the resolution and frame rate of Publisher when initializing
+      Example
+        OT.initPublisher(divId, {
+          resolution: '320x240',
+          frameRate: 15
+        });
+    By default the resolution of a Publisher is 640 x 480
+      but can set it to 1280x720 or 320x240 as well
+    By default the frame rate of video is 30 frames per second
+      but can set it to 15, 7, or 1 as well
+Troubleshooting
+  Handling Errors
+    There are callback methods
+      for both Session.publish() and OT.initPublisher()
+    Example
+      var connected = false;
+      var publisherInitialized = false;
+
+      var publisher = OT.initPublisher(function(err) {
+        if(error) {
+          // handle error
+        } else {
+          publisherInitialized = true;
+          publish();
+        }
+      });
+
+      var publish = function() {
+        if(connected && publisherInitialized) {
+          session.publish(publisher);
+        }
+      };
+
+      session.connect(token, function(err) {
+        if(err) {
+          // handle error
+        } else {
+          connected = true;
+          publish();
+        }
+      });
+        Best to wait for OT.initPublisher() to complete
+          and Session.connect() to complete and then call Session.publish()
+            This way we can handle all hardware isses
+              in the OT.initpublisher() callback
+            And all network related issues
+              in the Session.publish() callback
+  Access Denied
+    Higest number of failures to OT.initPublisher()
+      are result of end-user denying access to camera and microphone
+      can be handled by listening for the accessDenied event
+      Example
+        publisher.on({
+          'accessDeined': function() {
+            console.log('Please allow access to Camera and Microphone');
+          }
+        });
+  Device Access
+    Example
+      publisher = OT.initPublisher('publisher', {}, function (err) {
+        if (err) {
+          if (err.code === 1500 &&
+              err.message.indexOf('Publisher Access Denied:') >= 0) {
+                // Access denied can also be handled by the accessDenied event
+                showMessage('Please allow access to the Camera and Microphone');
+          } else {
+            showMessage('Failed to get access to your camera or microphone.');
+          }
+          publisher.destroy();
+          publisher = null;
+        }
+      });
+  Network Errors
+    Example
+      session.publish(publisher, function(err) {
+        if(err) {
+          if (err.code === 1553 || (err.code === 1500 &&
+              err.message.indexOf"Publisher PeerConnection Error:") >= 0)) {
+            showMessage("Streaming connection failed. \
+                         This could be due to a restrictive firewall.");
+          } else {
+            showMessage("An unknown error occurred while trying \
+                        to publish your video. Please try again later.");
+          }
+          publisher.destroy();
+          publisher = null;
+        }
+      });
+  Losing Connectivity
+    publisher.on({
+      streamDestroyed: function (event) {
+        if (event.reason === 'networkDisconnected') {
+          showMessage('Your publisher lost its connection. \
+                      Please check your internet connection \
+                      and try publishing again.');
+        }
+      }
+    });
+Putting it together
+  var session;
+  var publisher;
+
+  // Replace with the replacement element ID:
+  publisher = OT.initPublisher(replacementElementId);
+  publisher.on({
+    streamCreated: function (event) {
+      console.log("Publisher started streaming.");
+    },
+    streamDestroyed: function (event) {
+      console.log("Publisher stopped streaming. Reason: "
+        + event.reason);
+    }
+  });
+
+  // Replace apiKey and sessionID with your own values:
+  session = OT.initSession(apiKey, sessionID);
+  // Replace token with your own value:
+  session.connect(token, function (error) {
+    if (session.capabilities.publish == 1) {
+      session.publish(publisher);
+    } else {
+      console.log("You cannot publish an audio-video stream.");
+    }
+  });

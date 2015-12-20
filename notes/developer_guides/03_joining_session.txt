@@ -1,0 +1,110 @@
+Joining a Session - JavaScript (Client-side)
+  Initializing a Session object
+    before connecting to a session
+      need to instantiate a Session object from client side
+        does not create an OpenTok session
+          creates JavaScript Session object
+            which represents an existing OpenTok session
+      Example
+        // returns a Session object
+        if (OT.checkSystemRequirements() == 1) {
+          var session = OT.initSession(apiKey, sessionId);
+        } else {
+          // The client does not support WebRTC.
+          // Display own message here
+        }
+  Connecting to a session
+    Once we have initialized Session object, call its connect() method
+      pass in a token and a completion handler
+      Example
+        var session = OT.initSession(apiKey, sessionId);
+        session.connect(token, function(error) {
+          if(errors) {
+            console.log("Error connecting: ", error.code, error.message);
+          } else {
+            console.log("Connected to the session.");
+          }
+        });
+      Session object dispatches a sessionConnected event
+        when client connects to OpenTok session
+  Disconnecting from a session
+    To disconnect from session, call disconnect() on Session object
+    Example
+      session.disconnect();
+  Detecting when you have disconnected from a session
+    when client disconnects from session
+      Session object dispatches a sessionDisconnected event
+        Example
+          session.on("sessionDisconnected", function(event) {
+            if(event.reason == "networkDisconnected") {
+              alert("Your network connection terminated");
+            }
+          });
+  Detecting when clients have connected and disconnected
+    Session object dispatches a connectionCreated event
+      when new client (including your own) connects to the session
+    Session object dispatches connectDestroyed event
+      when other clients leave the session
+
+    var connectionCount;
+    session.on({
+      connectionCreated: function(event) {
+        connectionCount++;
+        if(event.connection.connectionId != session.connection.connectionId) {
+          console.log('Another connection. ' + connectionCount + ' total');
+        }
+      },
+      connectionDestroyed: function(event) {
+        connectionCount--;
+        console.log('A client disconnected. ' + connectionCount + ' total.');
+      }
+    });
+
+    session.connect(token, function(error) {
+      if(error) {
+        console.log("Failed to connect.");
+      } else {
+        console.log("You have connected to the session.");
+      }
+    });
+  Putting it together
+
+var session;
+var connectionCount = 0;
+
+function connect() {
+  session = OT.initSession(apiKey, sessionId);
+  session.on({
+    connectionCreated: function(event) {
+      connectionCount++;
+      console.log(connectionCount + ' connections.');
+    },
+    connectionDestroyed: function(event) {
+      connectionCount--;
+      console.log(connectionCount + ' connections.');
+    },
+    sessionDisconnected: function(event) {
+      console.log('Disconnected from the session.');
+      document.getElementById('disconnectBtn').style.display = 'none';
+      if(event.reason == 'networkDisconnected') {
+        alert('Your network connection terminated');
+      }
+    }
+  });
+
+  session.connect(token, function(error) {
+    if(error) {
+      console.log('Unable to connect: ', error.message);
+    } else {
+      document.getElementById('disconnectBtn').style.display = 'block';
+      console.log('Connected to the session.');
+      connectionCount = 1;
+    }
+  });
+}
+
+function disconnect() {
+  session.disconnect();
+}
+
+connect();
