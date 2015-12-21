@@ -1,0 +1,82 @@
+Detecting when new streams are created
+  Session object dispatches a streamCreated event
+    when new stream (other than your own)
+      is created in a session
+        new stream created when client publishes a stream to session
+    also dispatched for each existing stream in the session
+      when we first connect
+        event is defined by the StremEvent
+          which has a stream property, representing stream that was created
+    Example
+      session.on("streamCreated", function(event) {
+        console.log("New stream in the session: " + event.stream.streamId);
+      });
+Subscribing to a stream
+  To subscribe to stream pass Stream object into subscribe method
+    of the Session object
+      Example
+        session.subscribe(stream, replacementElementId);
+          stream
+            Stream object
+          targetElement
+            Defines the DOM element that the Subscriber video replaces
+          properties
+            set of properties to customize appearance of Subscriber view
+              can also select whether subscribe to audio and video
+            insertMode
+              "replace"
+              "after"
+              "before"
+              "append"
+          completionHandler
+            function that is called when subscribe() method finishes
+      Example: subscribe to all streams other than own
+        session.on("streamCreated", function(event) {
+          session.subscribe(event.stream);
+        });
+      Example
+        session.on('streamCreated', function(event) {
+          var subscriberProperties = {insertMode: 'append'};
+          var subscriber = session.subscribe(event.stream,
+            'subscriberContainer',
+            subscriberProperties,
+            function (error) {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log('Subscriber added.');
+              }
+          });
+        });
+Unsubscribing from a stream
+  session.unsubscribe(stream);
+Detecting when streams leave a session
+  Example: Other than your own
+    session.on("streamDestroyed", function(event) {
+      console.log("Stream stopped. Reason: " + event.reason);
+    });
+  Example: Your own
+    var publisher = OT.initPublisher();
+    publisher.on("streamDestroyed", function(event) {
+      console.log("Stream stopped. Reason: " + event.reason);
+    });
+Getting information about a stream
+  Stream object has following properties that define the stream
+    connection
+      we can compare this to connection property of Session object
+        to see if stream is being published by local web page
+    creationTime
+      calculated in miliseconds
+        can be converted to Date object
+          new Date(stream.creationTime)
+    hasAudio
+      whether stream has audio
+    hasVideo
+      whether stream has video
+    name
+      name of the stream
+        by default when user mosers over subscribe in HTML DOM
+    videoDimensions
+      width and height
+    videoType
+      camera or screen

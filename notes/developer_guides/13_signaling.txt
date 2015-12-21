@@ -1,0 +1,67 @@
+Signaling
+  send text and data between clients connected to OpenTok session
+
+Sending signal to all clients in a session
+  call the signal() method and set the to property of the signal paramter
+    Example
+      session.signal(
+        {
+          to: connection1,
+          data: "hello"
+        },
+        function(error) {
+          if(error) {
+            console.log("Signal error " + error.code + " " + error.message);
+          } else {
+            console.log("Signal sent.");
+          }
+        }
+      )
+  additionally, can pass in a type property of the signal paramter
+    string value that clients can filter when listening for signals
+    Example
+      session.signal(
+        {
+          data:"hello",
+          type:"textMessage"
+        },
+        function(error) {
+          if (error) {
+            console.log("signal error ("
+                        + error.code
+                        + "): " + error.message);
+          } else {
+            console.log("signal sent.");
+          }
+        }
+      );
+Sending a signal to specific clients in a session
+  call the signal() method but do not set a to property for signal parameter
+    Example
+      session.signal(
+        {
+          data: "hello"
+        },
+        function(error) {
+          if(error) {
+            console.log("Signal error " + error.code + " " + error.message);
+          } else {
+            console.log("Signal sent.");
+          }
+        }
+      );
+Receiving signals in a session
+  to start receiving all signals sent in a session
+    add event listener for the signal event
+      dispatched by Session object
+        Example
+          session.on("signal", function(event) {
+            console.log("Signal sent from connection " + event.from.id);
+            // Process the event.data property, if there is any data.
+          });
+  can listen for signals set to a specific type
+    Example: listen for signals of type "foo"
+      session.on("signal:foo", function(event) {
+        console.log("Signal sent from connection " + event.from.id);
+        // Process the event.data property, if there is any data.
+      });
