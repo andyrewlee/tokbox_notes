@@ -1,1 +1,85 @@
-coming soon
+Screen sharing
+  Can subscribe to a stream that uses screen capture
+    just like how we subscribe to a stream that uses camera as the source
+  For Chrome or Firefox
+    the client adds an extension that enables publishing screen-sharing
+  Built in for Internet Explorer
+  Requires page to be loaded over HTTPS
+
+Quick Start
+  Firefox and Chrome require user to install extension
+    to enable publishing a screen-sharing video stream
+  No extension required to subscribe to screen-sharing video stream
+
+Developing a Firefox screen-sharing extension
+  https://github.com/opentok/screensharing-extensions
+    includes instructions on developing extension
+
+Developing a Chrome screen-sharing extension
+  https://github.com/opentok/screensharing-extensions
+
+Example
+  <html>
+  <body>
+    <div id="camera"></div>
+    <div id="screen-preview"></div>
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+    <script type="text/javascript">
+
+      // Go to https://dashboard.tokbox.com/ to find your OpenTok
+      // API key and generate a test session ID and token:
+      var apiKey    = "<YOUR_API_KEY>";
+      var sessionId = "<YOUR_SESSION_ID>";
+      var token     = "<YOUR_TOKEN>";
+
+      var session = OT.initSession(apiKey, sessionId);
+
+      session.connect(token, function(error) {
+        var publisher = OT.initPublisher('camera');
+        session.publish(publisher, function() {
+          screenshare();
+        });
+      });
+
+      session.on('streamCreated', function(event) {
+        session.subscribe(event.stream);
+      });
+
+      // For Google Chrome only, register your extension by ID. You can
+      // find it at chrome://extensions once the extension is installed.
+      OT.registerScreenSharingExtension('chrome', '<YOUR_CHROME_EXTENSION_ID>');
+
+      function screenshare() {
+        OT.checkScreenSharingCapability(function(response) {
+          if (!response.supported || response.extensionRegistered === false) {
+            alert('This browser does not support screen sharing.');
+          } else if (response.extensionInstalled === false) {
+            alert('Please install the screen sharing extension and load your app over https.');
+          } else {
+            // Screen sharing is available. Publish the screen.
+            var screenSharingPublisher = OT.initPublisher('screen-preview', {videoSource: 'screen'});
+            session.publish(screenSharingPublisher, function(error) {
+              if (error) {
+                alert('Could not share the screen: ' + error.message);
+              }
+            });
+          }
+        });
+      }
+    </script>
+  </body>
+  </html>
+
+Determining the video type for a stream
+  Example
+    <div id="people"></div>
+    <div id="screens"></div>
+
+    session.on('streamCreated', function(event) {
+      var subOptions = {insertMode: 'append'};
+      if(event.stream.videoType === 'screen') {
+        session.subscribe(event.stream, 'screens', subOptions);
+      } else {
+        session.subscribe(event.stream, 'people', subOptions);
+      }
+    });
